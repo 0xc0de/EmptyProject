@@ -34,9 +34,11 @@ SOFTWARE.
 
 #include <World/Public/World.h>
 #include <World/Public/Components/InputComponent.h>
+#include <World/Public/Actors/PointLight.h>
 #include <World/Public/Canvas.h>
 #include <World/Public/Base/ResourceManager.h>
 #include <World/Public/Widgets/WViewport.h>
+#include <World/Public/MaterialGraph/MaterialGraph.h>
 
 #include <Core/Public/Image.h>
 #include <Runtime/Public/Runtime.h>
@@ -54,98 +56,9 @@ void AModule::OnGameStart() {
 
     World = AWorld::CreateWorld();
 
-    TPodArray< SPortalDef > portals;
-    TPodArray< Float3 > hullVerts;
-
-    portals.Resize( 5 );
-
     ALevel * level = NewObject< ALevel >();
     World->AddLevel( level );
     //ALevel * level = World->GetPersistentLevel();
-
-    Float3 position;
-    Float3 halfExtents;
-
-    level->Areas.Resize( 4 );
-    level->Areas.ZeroMem();
-
-    position = Float3(-1,0,0);
-    halfExtents = Float3(2.0f) * 0.5f;
-    level->Areas[0].Bounds.Mins = position - halfExtents;
-    level->Areas[0].Bounds.Maxs = position + halfExtents;
-
-    position = Float3(-3,0,0);
-    halfExtents = Float3(2.0f) * 0.5f;
-    level->Areas[1].Bounds.Mins = position - halfExtents;
-    level->Areas[1].Bounds.Maxs = position + halfExtents;
-
-    position = Float3(1,0,0);
-    halfExtents = Float3(2.0f) * 0.5f;
-    level->Areas[2].Bounds.Mins = position - halfExtents;
-    level->Areas[2].Bounds.Maxs = position + halfExtents;
-
-    position = Float3(1,0,3);
-    halfExtents = Float3(2,2,4) * 0.5f;
-    level->Areas[3].Bounds.Mins = position - halfExtents;
-    level->Areas[3].Bounds.Maxs = position + halfExtents;
-
-
-    Float3 points[4] = {
-        Float3( 0, 0.2f, -0.2f ),
-        Float3( 0, 0.8f, -0.2f ),
-        Float3( 0, 0.8f, 0.2f ),
-        Float3( 0, 0.2f, 0.2f )
-    };
-    portals[0].FirstVert = hullVerts.Size();
-    portals[0].NumVerts = 4;
-    portals[0].Areas[0] = 0;
-    portals[0].Areas[1] = 2;
-    hullVerts.Append( points, 4 );
-
-    for ( int i = 0 ; i < 4 ; i++ ) {
-        points[i].X -= 2;
-    }
-    portals[1].FirstVert = hullVerts.Size();
-    portals[1].NumVerts = 4;
-    portals[1].Areas[0] = 0;
-    portals[1].Areas[1] = 1;
-    hullVerts.Append( points, 4 );
-
-    Float3 points2[4] = {
-        Float3( 0.2f, 0.2f, 1 ),
-        Float3( 0.4f, 0.2f, 1 ),
-        Float3( 0.4f, 0.8f, 1 ),
-        Float3( 0.2f, 0.8f, 1 )
-    };
-    portals[2].FirstVert = hullVerts.Size();
-    portals[2].NumVerts = 4;
-    portals[2].Areas[0] = 2;
-    portals[2].Areas[1] = 3;
-    hullVerts.Append( points2, 4 );
-
-    for ( int i = 0 ; i < 4 ; i++ ) {
-        points[i].X -= 2;
-    }
-    portals[3].FirstVert = hullVerts.Size();
-    portals[3].NumVerts = 4;
-    portals[3].Areas[0] = -1;
-    portals[3].Areas[1] = 1;
-    hullVerts.Append( points, 4 );
-
-    for ( int i = 0 ; i < 4 ; i++ ) {
-        points2[i].Z += 4;
-    }
-    portals[4].FirstVert = hullVerts.Size();
-    portals[4].NumVerts = 4;
-    portals[4].Areas[0] = 3;
-    portals[4].Areas[1] = -1;
-    hullVerts.Append( points2, 4 );
-
-    level->CreatePortals( portals.ToPtr(), portals.Size(), hullVerts.ToPtr() );
-    level->Initialize();
-
-    // Spawn HUD
-    //AHUD * hud = World->SpawnActor< AMyHUD >();
 
     RenderingParams = NewObject< ARenderingParameters >();
     RenderingParams->BackgroundColor = AColor4::Black();
@@ -153,38 +66,21 @@ void AModule::OnGameStart() {
     RenderingParams->bWireframe = false;
     RenderingParams->bDrawDebug = true;
 
-    STransform t;
-    t.Rotation = Quat::Identity();
-    t.Scale = Float3(0.1f);
-    //int n = 0;
-    for ( int i = 0 ; i < 30 ; i++ )
-        for ( int j = 0 ; j < 14 ; j++ )
-            for ( int k = 0 ; k < 30 ; k++ ) {
+    STransform spawnTransform;
+    spawnTransform.Position = Float3(0.0f);
+    spawnTransform.Rotation = Quat::Identity();
+    spawnTransform.Scale = Float3( 1.0f ); //Float3(32, 0.1f, 32);
 
-                Float3 pos( i,j,k );
+    AChecker * checker = World->SpawnActor< AChecker >( spawnTransform, level );
+    AN_UNUSED( checker );
 
-                pos += Float3(-8, -4, -2 ) * 2.0f;
+    spawnTransform.Position = Float3(0,3,0);
+    spawnTransform.Rotation = Quat::Identity();
+    spawnTransform.Scale = Float3(1.0f);
+    APointLight * light = World->SpawnActor< APointLight >( spawnTransform, level );
+    light->LightComponent->SetRadius( 10.0f );
 
-                t.Position = pos*0.25;//*0.2f;
-
-                World->SpawnActor< AChecker >( t, level );
-                //GLogger.Printf("n %d\n",++n);
-            }
-
-    //GLogger.Printf( "sizeof AChecker %u sizeof AActor %u\n", sizeof(AChecker), sizeof(AActor) );
-
-    Float3 center(0);
-    for ( int i = 0 ; i < 4 ; i++ ) {
-        center += points2[i];
-    }
-    t.Position = center/4.0f;
-    t.Scale = Float3(0.1f,0.1f,3);
-    World->SpawnActor< AChecker >( t, level );
-
-    APlayer * player = World->SpawnActor< APlayer >( Float3(0,0.2f,1), Quat::Identity(), level );
-
-    //World->SpawnActor< FAtmosphere >();
-
+    APlayer * player = World->SpawnActor< APlayer >( Float3(0,1.0f,2.0f), Quat::Identity(), level );
 
     // Spawn player controller
     PlayerController = World->SpawnActor< APlayerController >();
@@ -193,7 +89,6 @@ void AModule::OnGameStart() {
     PlayerController->SetRenderingParameters( RenderingParams );
     //PlayerController->SetHUD( hud );
     PlayerController->GetInputComponent()->MouseSensitivity = 0.3f;
-
     PlayerController->SetPawn( player );
 
     WDesktop * desktop = NewObject< WDesktop >();
@@ -206,6 +101,9 @@ void AModule::OnGameStart() {
         .SetVerticalAlignment( WIDGET_ALIGNMENT_STRETCH )
         .SetFocus()
     );
+}
+
+void AModule::OnGameEnd() {
 }
 
 void AModule::SetInputMappings() {
@@ -228,29 +126,12 @@ void AModule::SetInputMappings() {
 }
 
 void AModule::CreateResources() {
-    // Texture Blank512
-    {
-        GetOrCreateResource< ATexture >( "Blank512", "/Common/blank512.png" );
-    }
+#if 0
+    
 
-    // CheckerMaterialInstance
-    {
-        static TStaticResourceFinder< AMaterial > MaterialResource( _CTS( "/Default/Materials/Unlit" ) );
-        static TStaticResourceFinder< ATexture > TextureResource( _CTS( "Blank512" ) );
-        AMaterialInstance * CheckerMaterialInstance = NewObject< AMaterialInstance >();
-        CheckerMaterialInstance->SetMaterial( MaterialResource.GetObject() );
-        CheckerMaterialInstance->SetTexture( 0, TextureResource.GetObject() );
-        RegisterResource( CheckerMaterialInstance, "CheckerMaterialInstance" );
-    }
+    
 
-    // Checker mesh
-    {
-        static TStaticResourceFinder< AMaterialInstance > MaterialInst( _CTS( "CheckerMaterialInstance" ) );
-        AIndexedMesh * CheckerMesh = NewObject< AIndexedMesh >();
-        CheckerMesh->InitializeFromFile( "/Default/Meshes/Sphere" );
-        CheckerMesh->SetMaterialInstance( 0, MaterialInst.GetObject() );
-        RegisterResource( CheckerMesh, "CheckerMesh" );
-    }
+    
 
     // Skybox texture
     {
@@ -287,27 +168,125 @@ void AModule::CreateResources() {
         RegisterResource( SkyboxTexture, "SkyboxTexture" );
     }
 
+    
+#endif
+
+    
+
+    // Skybox texture
+    {
+        byte data[1] = {};
+
+        ATexture * texture = NewObject< ATexture >();
+        
+        texture->InitializeCubemap( TEXTURE_PF_R8_UNORM, 1, 1 );
+
+        for ( int face = 0 ; face < 6 ; face++ ) {
+            texture->WriteTextureDataCubemap( 0, 0, 1, 1, face, 0, data );
+        }
+
+        RegisterResource( texture, "BlackSky" );
+    }
+
     // Skybox material instance
     {
         static TStaticResourceFinder< AMaterial > SkyboxMaterial( _CTS( "/Default/Materials/Skybox" ) );
-        static TStaticResourceFinder< ATexture > SkyboxTexture( _CTS( "SkyboxTexture" ) );
+        //static TStaticResourceFinder< ATexture > SkyboxTexture( _CTS( "SkyboxTexture" ) );
+        static TStaticResourceFinder< ATexture > SkyboxTexture( _CTS( "BlackSky" ) );
         AMaterialInstance * SkyboxMaterialInstance = NewObject< AMaterialInstance >();
         SkyboxMaterialInstance->SetMaterial( SkyboxMaterial.GetObject() );
         SkyboxMaterialInstance->SetTexture( 0, SkyboxTexture.GetObject() );
         RegisterResource( SkyboxMaterialInstance, "SkyboxMaterialInstance" );
     }
+
+    // Texture Grid8
+    {
+        GetOrCreateResource< ATexture >( "Grid8", "/Common/grid8.png" );
+    }
+
+    // Material
+    {
+        MGMaterialGraph * graph = NewObject< MGMaterialGraph >();
+
+        MGInTexCoord * inTexCoordBlock = graph->AddNode< MGInTexCoord >();
+
+        MGVertexStage * materialVertexStage = graph->AddNode< MGVertexStage >();
+
+        MGNextStageVariable * texCoord = materialVertexStage->AddNextStageVariable( "TexCoord", AT_Float2 );
+        texCoord->Connect( inTexCoordBlock, "Value" );
+
+        MGTextureSlot * diffuseTexture = graph->AddNode< MGTextureSlot >();
+        diffuseTexture->SamplerDesc.Filter = TEXTURE_FILTER_MIPMAP_TRILINEAR;
+
+        MGSampler * textureSampler = graph->AddNode< MGSampler >();
+        textureSampler->TexCoord->Connect( materialVertexStage, "TexCoord" );
+        textureSampler->TextureSlot->Connect( diffuseTexture, "Value" );
+
+        MGFragmentStage * materialFragmentStage = graph->AddNode< MGFragmentStage >();
+        materialFragmentStage->Color->Connect( textureSampler, "RGBA" );
+
+        graph->VertexStage = materialVertexStage;
+        graph->FragmentStage = materialFragmentStage;
+        graph->MaterialType = MATERIAL_TYPE_PBR;
+        graph->RegisterTextureSlot( diffuseTexture );
+
+        AMaterialBuilder * builder = NewObject< AMaterialBuilder >();
+        builder->Graph = graph;
+
+        SMaterialDef def;
+        builder->BuildData( def );
+
+        AMaterial * material = NewObject< AMaterial >();
+        material->Initialize( &def );
+        RegisterResource( material, "MyMaterial" );
+    }
+
+    // CheckerMaterialInstance
+    {
+        static TStaticResourceFinder< AMaterial > MaterialResource( _CTS( "MyMaterial" ) );
+        static TStaticResourceFinder< ATexture > TextureResource( _CTS( "Grid8" ) );
+        AMaterialInstance * CheckerMaterialInstance = NewObject< AMaterialInstance >();
+        CheckerMaterialInstance->SetMaterial( MaterialResource.GetObject() );
+        CheckerMaterialInstance->SetTexture( 0, TextureResource.GetObject() );
+        RegisterResource( CheckerMaterialInstance, "Grid8MaterialInstance" );
+    }
+
+    //
+    // Example, how to create mesh resource and register it
+    //
+    {
+        static TStaticResourceFinder< AMaterialInstance > MaterialInst( _CTS( "Grid8MaterialInstance" ) );
+
+        AIndexedMesh * mesh = NewObject< AIndexedMesh >();
+        mesh->InitializePlaneMesh( 256, 256, 256 );
+        ACollisionBox * box = mesh->BodyComposition.AddCollisionBody< ACollisionBox >();
+        box->HalfExtents.X = 128;
+        box->HalfExtents.Y = 0.1f;
+        box->HalfExtents.Z = 128;
+        box->Position.Y -= box->HalfExtents.Y;
+        mesh->SetMaterialInstance( 0, MaterialInst.GetObject() );
+        RegisterResource( mesh, "DefaultShapePlane256x256x256" );
+    }
+
+    //// Checker mesh
+    //{
+    //    static TStaticResourceFinder< AMaterialInstance > MaterialInst( _CTS( "Grid8MaterialInstance" ) );
+    //    AIndexedMesh * CheckerMesh = NewObject< AIndexedMesh >();
+    //    CheckerMesh->InitializeFromFile( "/Default/Meshes/Box" );
+    //    CheckerMesh->SetMaterialInstance( 0, MaterialInst.GetObject() );
+    //    RegisterResource( CheckerMesh, "CheckerMesh" );
+    //}
 }
 
 #include <Runtime/Public/EntryDecl.h>
 
 static SEntryDecl ModuleDecl = {
     // Game title
-    "AngieEngine: Portals",
+    "AngieEngine: Empty Project",
     // Root path
-    "Samples/Portals",
+    "Data",
     // Module class
     &AModule::ClassMeta()
 };
 
 AN_ENTRY_DECL( ModuleDecl )
-

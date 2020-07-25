@@ -4,12 +4,12 @@ project( EmptyProject )
 
 set( PROJECT_OUTPUT_DIR "D:/EmptyProject" )
 
-include( AngieEngine/trunk/Source/Engine/AngieConfig.cmake )
+include( AngieEngine/Source/Engine/AngieConfig.cmake )
 
 # Engine
-include_directories( AngieEngine/trunk/Source/Engine )
+include_directories( AngieEngine/Source/Engine )
 add_definitions( -DANGIE_STATIC_LIBRARY )
-add_subdirectory( AngieEngine/trunk/Source )
+add_subdirectory( AngieEngine/Source )
 
 add_subdirectory( Source )
-set_target_properties( Source PROPERTIES FOLDER "Project" )
+set_target_properties( EmptyProject PROPERTIES FOLDER "Project" )

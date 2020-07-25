@@ -36,7 +36,7 @@ SOFTWARE.
 AN_CLASS_META( AChecker )
 
 AChecker::AChecker() {
-    static TStaticResourceFinder< AIndexedMesh > CheckerMesh( _CTS( "CheckerMesh" ) );
+    static TStaticResourceFinder< AIndexedMesh > CheckerMesh( _CTS( "DefaultShapePlane256x256x256" ) );
 
     AMeshComponent * component = CreateComponent< AMeshComponent >( "checker" );
     component->SetMesh( CheckerMesh.GetObject() );

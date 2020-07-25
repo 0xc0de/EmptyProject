@@ -29,15 +29,3 @@ SOFTWARE.
 */
 
 #pragma once
-
-#include <World/Public/Actors/PlayerController.h>
-
-class ANGIE_API AMyPlayerController : public APlayerController {
-    AN_ACTOR( AMyPlayerController, APlayerController )
-
-protected:
-
-    void Tick( float _TimeStep ) override;
-
-    AMyPlayerController();
-};

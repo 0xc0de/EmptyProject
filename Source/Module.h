@@ -33,9 +33,10 @@ SOFTWARE.
 #include <GameThread/Public/EngineInstance.h>
 #include <World/Public/Resource/IndexedMesh.h>
 #include <World/Public/Resource/Material.h>
-#include "MyPlayerController.h"
+#include <World/Public/Actors/PlayerController.h>
 
-class AModule final : public IGameModule {
+class AModule final : public IGameModule
+{
     AN_CLASS( AModule, IGameModule )
 
 public:
@@ -52,7 +53,7 @@ private:
     //
 
     void OnGameStart() override;
-    void OnGameEnd() override {}
+    void OnGameEnd() override;
     void SetInputMappings();
     void CreateResources();
 };

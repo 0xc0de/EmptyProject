@@ -46,24 +46,25 @@ APlayer::APlayer() {
 
     PawnCamera = Camera;
 
-//    Box = CreateComponent< AMeshComponent >( "checker" );
-//    Box->SetMesh( CheckerMesh.GetObject() );
-//    Box->CopyMaterialsFromMeshResource();
-//    Box->SetPosition( 0, 0, -0.5f );
-//    Box->SetScale( 0.1f );
-//    Box->AttachTo( Camera );
+    //Box = CreateComponent< AMeshComponent >( "checker" );
+    //Box->SetMesh( CheckerMesh.GetObject() );
+    //Box->CopyMaterialsFromMeshResource();
+    //Box->SetPosition( 0, 0, -0.5f );
+    //Box->SetScale( 0.1f );
+    //Box->AttachTo( Camera );
 
     bCanEverTick = true;
 
-    //static TStaticResourceFinder< AIndexedMesh > UnitBox( _CTS( "/Default/Meshes/Box" ) );
-    //static TStaticResourceFinder< AMaterialInstance > SkyboxMaterialInst( _CTS( "SkyboxMaterialInstance" ) );
-    //Skybox = CreateComponent< AMeshComponent >( "Skybox" );
-    //Skybox->SetMesh( UnitBox.GetObject() );
-    //Skybox->SetMaterialInstance( SkyboxMaterialInst.GetObject() );
-    //Skybox->ForceOutdoor( true );
-    //Skybox->AttachTo( Camera );
-    //Skybox->SetAbsoluteRotation( true );
-    //Skybox->RenderingOrder = RENDER_ORDER_SKYBOX;
+    static TStaticResourceFinder< AIndexedMesh > SkyboxMesh( _CTS( "/Default/Meshes/Skybox" ) );
+    static TStaticResourceFinder< AMaterialInstance > SkyboxMaterialInst( _CTS( "SkyboxMaterialInstance" ) );
+    Skybox = CreateComponent< AMeshComponent >( "Skybox" );
+    Skybox->SetMesh( SkyboxMesh.GetObject() );
+    Skybox->SetMaterialInstance( SkyboxMaterialInst.GetObject() );
+    //Skybox->CopyMaterialsFromMeshResource();
+    Skybox->ForceOutdoor( true );
+    Skybox->AttachTo( Camera );
+    Skybox->SetAbsoluteRotation( true );
+    Skybox->RenderingOrder = RENDER_ORDER_SKYBOX;
 }
 
 void APlayer::BeginPlay() {
@@ -123,18 +124,18 @@ void APlayer::Tick( float _TimeStep ) {
 
 //    Box->TurnLeftFPS( _TimeStep );
 
-    SWorldRaycastFilter filter;
+    //SWorldRaycastFilter filter;
 
-    filter.QueryMask = VSD_QUERY_MASK_VISIBLE | VSD_QUERY_MASK_VISIBLE_IN_LIGHT_PASS;
+    //filter.QueryMask = VSD_QUERY_MASK_VISIBLE | VSD_QUERY_MASK_VISIBLE_IN_LIGHT_PASS;
 
-    SWorldRaycastClosestResult result;
-    if ( GetWorld()->RaycastClosest( result, RootComponent->GetPosition(), RootComponent->GetPosition() + RootComponent->GetForwardVector()*99999.0f, &filter ) ) {
-        HitPos = result.TriangleHit.Location;
-        HitNormal = result.TriangleHit.Normal;
-        Triangle[0] = result.Vertices[0];
-        Triangle[1] = result.Vertices[1];
-        Triangle[2] = result.Vertices[2];
-    }
+    //SWorldRaycastClosestResult result;
+    //if ( GetWorld()->RaycastClosest( result, RootComponent->GetPosition(), RootComponent->GetPosition() + RootComponent->GetForwardVector()*99999.0f, &filter ) ) {
+    //    HitPos = result.TriangleHit.Location;
+    //    HitNormal = result.TriangleHit.Normal;
+    //    Triangle[0] = result.Vertices[0];
+    //    Triangle[1] = result.Vertices[1];
+    //    Triangle[2] = result.Vertices[2];
+    //}
 }
 
 void APlayer::MoveForward( float _Value ) {
@@ -176,9 +177,9 @@ void APlayer::SpeedRelease() {
 void APlayer::DrawDebug( ADebugRenderer * InRenderer ) {
     Super::DrawDebug( InRenderer );
 
-    InRenderer->SetDepthTest( false );
-    InRenderer->SetColor( AColor4( 1, 0, 0, 0.5f ) );
-    InRenderer->DrawTriangles( Triangle, 1, sizeof( Float3 ), true );
-    InRenderer->SetColor( AColor4( 0, 1, 0, 1 ) );
-    InRenderer->DrawLine( HitPos, HitPos + HitNormal * 10 );
+    //InRenderer->SetDepthTest( false );
+    //InRenderer->SetColor( AColor4( 1, 0, 0, 0.5f ) );
+    //InRenderer->DrawTriangles( Triangle, 1, sizeof( Float3 ), true );
+    //InRenderer->SetColor( AColor4( 0, 1, 0, 1 ) );
+    //InRenderer->DrawLine( HitPos, HitPos + HitNormal * 10 );
 }

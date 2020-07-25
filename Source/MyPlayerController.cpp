@@ -27,18 +27,3 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-
-#include "MyPlayerController.h"
-
-#include <GameThread/Public/EngineInstance.h>
-
-AN_CLASS_META( AMyPlayerController )
-
-AMyPlayerController::AMyPlayerController() {
-    bCanEverTick = true;
-}
-
-void AMyPlayerController::Tick( float _TimeStep ) {
-    Super::Tick( _TimeStep );
-}
-
