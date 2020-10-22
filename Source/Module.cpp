@@ -208,36 +208,22 @@ void AModule::CreateResources() {
     {
         MGMaterialGraph * graph = NewObject< MGMaterialGraph >();
 
-        MGInTexCoord * inTexCoordBlock = graph->AddNode< MGInTexCoord >();
-
-        MGVertexStage * materialVertexStage = graph->AddNode< MGVertexStage >();
-
-        MGNextStageVariable * texCoord = materialVertexStage->AddNextStageVariable( "TexCoord", AT_Float2 );
-        texCoord->Connect( inTexCoordBlock, "Value" );
+        MGInTexCoord * inTexCoord = graph->AddNode< MGInTexCoord >();
 
         MGTextureSlot * diffuseTexture = graph->AddNode< MGTextureSlot >();
         diffuseTexture->SamplerDesc.Filter = TEXTURE_FILTER_MIPMAP_TRILINEAR;
 
         MGSampler * textureSampler = graph->AddNode< MGSampler >();
-        textureSampler->TexCoord->Connect( materialVertexStage, "TexCoord" );
+        textureSampler->TexCoord->Connect( inTexCoord, "Value" );
         textureSampler->TextureSlot->Connect( diffuseTexture, "Value" );
 
-        MGFragmentStage * materialFragmentStage = graph->AddNode< MGFragmentStage >();
-        materialFragmentStage->Color->Connect( textureSampler, "RGBA" );
+        graph->Color->Connect( textureSampler, "RGBA" );
 
-        graph->VertexStage = materialVertexStage;
-        graph->FragmentStage = materialFragmentStage;
         graph->MaterialType = MATERIAL_TYPE_PBR;
         graph->RegisterTextureSlot( diffuseTexture );
 
-        AMaterialBuilder * builder = NewObject< AMaterialBuilder >();
-        builder->Graph = graph;
-
-        SMaterialDef def;
-        builder->BuildData( def );
-
         AMaterial * material = NewObject< AMaterial >();
-        material->Initialize( &def );
+        material->Initialize( graph );
         RegisterResource( material, "MyMaterial" );
     }
 
@@ -258,7 +244,7 @@ void AModule::CreateResources() {
         static TStaticResourceFinder< AMaterialInstance > MaterialInst( _CTS( "Grid8MaterialInstance" ) );
 
         AIndexedMesh * mesh = NewObject< AIndexedMesh >();
-        mesh->InitializePlaneMesh( 256, 256, 256 );
+        mesh->InitializePlaneMeshXZ( 256, 256, 256 );
         ACollisionBox * box = mesh->BodyComposition.AddCollisionBody< ACollisionBox >();
         box->HalfExtents.X = 128;
         box->HalfExtents.Y = 0.1f;

@@ -58,13 +58,13 @@ APlayer::APlayer() {
     static TStaticResourceFinder< AIndexedMesh > SkyboxMesh( _CTS( "/Default/Meshes/Skybox" ) );
     static TStaticResourceFinder< AMaterialInstance > SkyboxMaterialInst( _CTS( "SkyboxMaterialInstance" ) );
     Skybox = CreateComponent< AMeshComponent >( "Skybox" );
+    Skybox->SetMotionBehavior( MB_KINEMATIC );
     Skybox->SetMesh( SkyboxMesh.GetObject() );
     Skybox->SetMaterialInstance( SkyboxMaterialInst.GetObject() );
-    //Skybox->CopyMaterialsFromMeshResource();
     Skybox->ForceOutdoor( true );
     Skybox->AttachTo( Camera );
     Skybox->SetAbsoluteRotation( true );
-    Skybox->RenderingOrder = RENDER_ORDER_SKYBOX;
+    Skybox->SetVisibilityGroup( VISIBILITY_GROUP_SKYBOX );
 }
 
 void APlayer::BeginPlay() {
