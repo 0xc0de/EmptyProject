@@ -45,12 +45,8 @@ SOFTWARE.
 
 AN_CLASS_META( AModule )
 
-AModule * GModule;
-
-void AModule::OnGameStart() {
-
-    GModule = this;
-
+AModule::AModule()
+{
     SetInputMappings();
     CreateResources();
 
@@ -103,9 +99,6 @@ void AModule::OnGameStart() {
     );
 }
 
-void AModule::OnGameEnd() {
-}
-
 void AModule::SetInputMappings() {
     InputMappings = NewObject< AInputMappings >();
 
@@ -127,12 +120,6 @@ void AModule::SetInputMappings() {
 
 void AModule::CreateResources() {
 #if 0
-    
-
-    
-
-    
-
     // Skybox texture
     {
         const char * Cubemap[6] = {
